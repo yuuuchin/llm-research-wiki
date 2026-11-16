@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="utf-8">
+  <title>狀態空間的藝術與本質 - 日系文青可愛風簡報</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Reveal.js CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+  
+  <!-- Google Fonts: 圓潤清新的日系文青字體 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- KaTeX for math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+          onload="renderMathInElement(document.body);"></script>
+
+  <style>
+    /* 提案一配色：和紙便籤 × 宇治抹茶淡粉 */
+    :root {
+      --bg-washi: #FDFBF7;           /* 和紙米白底色 */
+      --matcha-green: #90A983;       /* 宇治抹茶淡綠 */
+      --matcha-light: #EBF1E8;       /* 極淡抹茶底 */
+      --sakura-pink: #E8B4B8;        /* 灰櫻粉 */
+      --sakura-light: #FBF0F1;       /* 極淡櫻粉底 */
+      --caramel-warm: #E2B887;       /* 暖焦糖淡黃 */
+      --text-charcoal: #3D3D3D;      /* 柔和深炭灰文字 */
+      --text-sub: #6E6E6E;           /* 次要灰文字 */
+      --card-bg: #FFFFFF;            /* 便籤純白卡片 */
+      --shadow-soft: 0 8px 24px rgba(144, 169, 131, 0.12);
+    }
+
+    body {
+      background-color: var(--bg-washi);
+      color: var(--text-charcoal);
+      font-family: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+    }
+
+    .reveal {
+      background-color: var(--bg-washi);
+      color: var(--text-charcoal);
+      font-family: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+    }
+
+    .reveal h1, .reveal h2, .reveal h3 {
+      font-family: 'M PLUS Rounded 1c', sans-serif;
+      color: var(--text-charcoal);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: none;
+    }
+
+    /* 可愛便籤卡片 (Washi Note Card) */
+    .note-card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 30px 36px;
+      box-shadow: var(--shadow-soft);
+      border: 2px dashed #E5DEC9;
+      position: relative;
+      margin: 15px auto;
+      text-align: left;
+    }
+
+    /* 頂部手帳紙膠帶裝飾 (Washi Tape) */
+    .washi-tape {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 110px;
+      height: 24px;
+      background-color: rgba(232, 180, 184, 0.7);
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .washi-tape-matcha {
+      background-color: rgba(144, 169, 131, 0.65);
+    }
+
+    /* 螢光筆標記效果 (Highlighter) */
+    .highlight-pink {
+      background: linear-gradient(transparent 60%, rgba(232, 180, 184, 0.45) 40%);
+      padding: 0 4px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    .highlight-matcha {
+      background: linear-gradient(transparent 60%, rgba(144, 169, 131, 0.45) 40%);
+      padding: 0 4px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    /* 可愛標籤膠囊 (Pill Tag) */
+    .pill-tag {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 30px;
+      font-size: 0.55em;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      margin: 4px 6px;
+    }
+
+    .tag-matcha { background: var(--matcha-light); color: var(--matcha-green); border: 1px solid var(--matcha-green); }
+    .tag-pink { background: var(--sakura-light); color: var(--sakura-pink); border: 1px solid var(--sakura-pink); }
+    .tag-caramel { background: #FFF9F0; color: #C58E55; border: 1px solid #E2B887; }
+
+    /* 列表項目符號 */
+    .cute-list {
+      list-style: none;
+      padding-left: 10px;
+      font-size: 0.85em;
+      line-height: 1.8;
+    }
+
+    .cute-list li {
+      margin-bottom: 12px;
+      position: relative;
+      padding-left: 28px;
+    }
+
+    .cute-list li::before {
+      content: '✿';
+      position: absolute;
+      left: 0;
+      color: var(--sakura-pink);
+      font-size: 1.1em;
+    }
+
+    .matcha-list li::before {
+      content: '●';
+      color: var(--matcha-green);
+    }
+
+    /* 雙欄版面 */
+    .two-col {
+      display: flex;
+      gap: 24px;
+      align-items: stretch;
+      margin-top: 20px;
+    }
+
+    .col {
+      flex: 1;
+    }
+
+    /* 表格樣式 */
+    .cute-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border-radius: 14px;
+      overflow: hidden;
+      font-size: 0.65em;
+      margin-top: 15px;
+      background: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+
+    .cute-table th {
+      background-color: var(--matcha-green);
+      color: #FFFFFF;
+      padding: 12px 14px;
+      font-weight: 700;
+      border: none;
+    }
+
+    .cute-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #F0ECE1;
+      color: var(--text-charcoal);
+    }
+
+    .cute-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* 幻燈片右上角小裝飾 */
+    .slide-badge {
+      position: absolute;
+      top: -30px;
+      right: 10px;
+      font-size: 0.45em;
+      color: #A3A3A3;
+      letter-spacing: 0.1em;
+    }
+
+    /* 講者頭像 / 小標註區塊 */
+    .bubble-box {
+      background: var(--sakura-light);
+      border: 1.5px solid var(--sakura-pink);
+      border-radius: 16px;
+      padding: 14px 20px;
+      font-size: 0.7em;
+      line-height: 1.6;
+      margin-top: 15px;
+      color: #4A4A4A;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- Slide 1: 封面 -->
+      <section data-background-color="#FDFBF7">
+        <div class="slide-badge">LLM & OPTIMIZATION RESEARCH WIKI</div>
+        <div style="margin-top: 30px;">
+          <span class="pill-tag tag-matcha">動態規劃</span>
+          <span class="pill-tag tag-pink">狀態擴增</span>
+          <span class="pill-tag tag-caramel">演算法美學</span>
+        </div>
+        <h1 style="font-size: 2.1em; margin-top: 25px; color: #3A3A3A;">
+          狀態空間的藝術與本質 ✿
+        </h1>
+        <h3 style="font-size: 1.05em; font-weight: 500; color: #757575; margin-bottom: 35px;">
+          為什麼在多階段決策與演算法研究中，它是成敗的關鍵？
+        </h3>
+        
+        <div class="note-card" style="max-width: 620px; text-align: center; margin: 0 auto; padding: 20px 24px;">
+          <div class="washi-tape"></div>
+          <p style="font-size: 0.72em; margin: 0; color: #5C5C5C; line-height: 1.8;">
+            🌱 <strong>基於 Wiki 知識庫研究主題提煉</strong><br>
+            從 Bellman 最佳化原理到轉彎懲罰與顧問問題思想實驗
+          </p>
+        </div>
+        <aside class="notes">
+          大家早安！在演算法或運籌研究中，我們常把重點放在「怎麼解方程式」，但動態規劃最核心、最優雅的起點，其實是「狀態空間」如何定義。今天我們就用溫暖的角度來拆解這門藝術。
+        </aside>
+      </section>
+
+      <!-- Slide 2: 暴力窮舉 vs 動態規劃 -->
+      <section data-background-color="#FDFBF7">
+        <div class="slide-badge">MOTIVATION & CHALLENGE</div>
+        <h2 style="font-size: 1.5em; text-align: left; margin-bottom: 10px;">
+          從 <span class="highlight-pink">組合爆炸</span> 到多項式優雅
+        </h2>
+        <p style="font-size: 0.7em; color: var(--text-sub); text-align: left; margin-bottom: 20px;">
+          面對多階段循序決策，傳統窮舉如何面臨算力牆？
+        </p>
+
+        <div class="two-col">
+          <div class="col note-card">
+            <div class="washi-tape"></div>
+            <h4 style="font-size: 0.9em; color: #B3545A; margin-top: 5px;">⚠ 暴力枚舉 (Brute-force)</h4>
+            <ul class="cute-list" style="font-size: 0.72em;">
+              <li>路徑數呈指數級膨脹：$inom{N}{N/2}$ 或 $2^N$ 條可能路徑</li>
+              <li>$N=6$ 階段已有 20 條路徑、100 次加法</li>
+              <li>當 $N=20$ 時需 <strong>300 萬次加法</strong>，算力迅速失控</li>
+              <li>時間複雜度：<span class="highlight-pink">$O(2^N)$ 指數級爆炸</span></li>
+            </ul>
+          </div>
+
+          <div class="col note-card">
+            <div class="washi-tape washi-tape-matcha"></div>
+            <h4 style="font-size: 0.9em; color: var(--matcha-green); margin-top: 5px;">✿ 動態規劃 (Dynamic Prog.)</h4>
+            <ul class="cute-list matcha-list" style="font-size: 0.72em;">
+              <li>重複子問題不重算，填入查表（Look-up Table）</li>
+              <li>$N=6$ 僅需 <strong>24 次加法與 9 次比較</strong></li>
+              <li>$N=20$ 僅需 220 次加法，效率提升數萬倍</li>
+              <li>時間複雜度：<span class="highlight-matcha">$O(N^2)$ 多項式收斂</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <aside class="notes">
+          面對指數級增長的路徑，暴力窮舉直接破產。動態規劃能讓計算次數驟降，關鍵就在於它不是重複走老路，而是把狀態濃縮成查表。
+        </aside>
+      </section>
+
+      <!-- Slide 3: 什麼是狀態空間？ -->
+      <section data-background-color="#FDFBF7">
+        <div class="slide-badge">DEFINITION & CORE ROLE</div>
+        <h2 style="font-size: 1.5em; text-align: left; margin-bottom: 10px;">
+          什麼是 <span class="highlight-matcha">「狀態空間」</span> (State Space)？
+        </h2>
+        <p style="font-size: 0.7em; color: var(--text-sub); text-align: left; margin-bottom: 20px;">
+          它不只是幾何座標，而是承載子問題的核心容器
+        </p>
+
+        <div class="note-card">
+          <div class="washi-tape washi-tape-matcha"></div>
+          <ul class="cute-list matcha-list" style="font-size: 0.78em;">
+            <li>
+              <strong>最小充分資訊（Sufficient Information）</strong>：<br>
+              描述系統在某階段現狀的最小變數集合，包含單調推進的<strong>階段變數</strong> $x$（Stage Variable）。
+            </li>
+            <li>
+              <strong>子問題嵌入（Subproblem Embedding）的標籤</strong>：<br>
+              將全局問題拆解為子問題家族，每個狀態 $(x,y)$ 標記一個子問題：
+              <div style="text-align: center; margin: 12px 0;">
+                $$S(x,y) 	riangleq 	ext{從頂點 } (x,y) 	ext{ 出發到達終點 } B 	ext{ 的最小剩餘成本 (Cost-to-go)}$$
+              </div>
+            </li>
+            <li>
+              <strong>狀態決定遞迴關係式（Recurrence Relation）</strong>：<br>
+              由後向前階段性建表，小問題優先求解（Smaller-subproblems-first）。
+            </li>
+          </ul>
+        </div>
+
+        <aside class="notes">
+          狀態空間不只是幾何座標，它是「把大問題拆成小問題」的載體。只要知道你在哪個狀態，未來的命運就可以被單獨計算。
+        </aside>
+      </section>
+
+      <!-- Slide 4: 為什麼需要討論？理由一：守護最佳化原理 -->
+      <section data-background-color="#FDFBF7">
+        <div class="slide-badge">WHY DISCUSS? — PART 1</div>
+        <h2 style="font-size: 1.5em; text-align: left; margin-bottom: 10px;">
+          理由一：守護 <span class="highlight-pink">最佳化原理</span>
+        </h2>
+        <p style="font-size: 0.7em; color: var(--text-sub); text-align: left; margin-bottom: 20px;">
+          Principle of Optimality 並非無條件成立，它極度依賴狀態充分性
+        </p>
+
+        <div class="note-card" style="margin-bottom: 15px;">
+          <div class="washi-tape"></div>
+          <p style="font-size: 0.82em; line-height: 1.8; margin: 0; color: #4A4A4A;">
+            <strong>✦ 貝爾曼最佳化原理（Bellman's Principle of Optimality）：</strong><br>
+            「無論初始狀態與決策為何，對於由此決策轉移形成的新狀態而言，其餘留決策必須構成以該新狀態為起點的最優路徑。」
+          </p>
+        </div>
+
+        <div class="two-col">
+          <div class="col note-card" style="padding: 20px 24px;">
+            <h4 style="font-size: 0.82em; color: var(--matcha-green); margin-top: 5px;">🌱 無後效性 (Markovian)</h4>
+            <p style="font-size: 0.68em; color: #5C5C5C; margin: 0; line-height: 1.6;">
+              未來的最優演化只能取決於<strong>當前狀態</strong>，絕不能隱性依賴過去的路徑歷史。
+            </p>
+          </div>
+          <div class="col note-card" style="padding: 20px 24px;">
+            <h4 style="font-size: 0.82em; color: #C25B65; margin-top: 5px;">⚠ 狀態遺漏的致命傷</h4>
+            <p style="font-size: 0.68em; color: #5C5C5C; margin: 0; line-height: 1.6;">
+              若狀態漏掉關鍵歷史特徵，最佳化原理立刻破功，寫出來的遞迴式將算出錯誤結果！
+            </p>
+          </div>
+        </div>
+
+        <aside class="notes">
+          很多同學會問：Bellman 方程式總是成立的嗎？答案是：只有當狀態定義正確時它才成立！狀態空間就像容器，容器漏了關鍵變數，整個理論架構就崩塌了。
+        </aside>
+      </section>
+
+      <!-- Slide 5: 經典案例：轉彎懲罰與狀態擴增 -->
+      <section data-background-color="#FDFBF7">
+        <div class="slide-badge">WHY DISCUSS? — PART 2</div>
+        <h2 style="font-size: 1.5em; text-align: left; margin-bottom: 10px;">
+          理由二：破解 <span class="highlight-matcha">次優截斷陷阱</span>
+        </h2>
+        <p style="font-size: 0.7em; color: var(--text-sub); text-align: left; margin-bottom: 15px;">
+          轉彎懲罰問題（Turn Penalty）：物理座標失效與狀態擴增
+        </p>
+
+        <div class="two-col">
+          <div class="col note-card" style="padding: 22px;">
+            <div class="washi-tape"></div>
+            <h4 style="font-size: 0.82em; color: #C25B65; margin-top: 5px;">❌ 僅用物理座標 $(x,y)$</h4>
+            <ul class="cute-list" style="font-size: 0.65em;">
+              <li>轉彎額外罰 $p=3$；直行無罰款</li>
+              <li>不知道進入方向，無法判斷是否轉彎</li>
+              <li>若在節點貪婪取 $\min$，會過早截斷當前看似昂貴、但後續具直行優勢的子路徑</li>
+              <li><strong>結局</strong>：全局算出非最優解！</li>
+            </ul>
+          </div>
+
+          <div class="col note-card" style="padding: 22px;">
+            <div class="washi-tape washi-tape-matcha"></div>
+            <h4 style="font-size: 0.82em; color: var(--matcha-green); margin-top: 5px;">✔ 狀態空間擴增 $S(x,y,z)$</h4>
+            <ul class="cute-list matcha-list" style="font-size: 0.65em;">
+              <li>擴增方向變數 $z \in \{U, D\}$，記錄到達決策</li>
+              <li>查表空間翻倍（每個座標拆分為上下半層）</li>
+              <li>同時記錄與保留兩方向價值，不提前比較</li>
+              <li><strong>結局</strong>：完美恢復最優性！</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="bubble-box">
+          ✿ <strong>核心遞迴式</strong>：$S(x,y,U) = \min \{ 	ext{直行: } a_u + S(x+1,y+1,U), \;	ext{轉彎: } p + a_d + S(x+1,y-1,D) \}$
+        </div>
+
+        <aside class="notes">
+          這就是著名的轉彎懲罰案例。如果貪心只留每個座標最便宜的路，最後走出來反而是錯的！我們必須把「方向」當作狀態的一部分，雖然表格多了一倍，但保證了全局正確性。
+        </aside>
+      </section>
+
+      <!-- Slide 6: 思考工具：顧問問題思想實驗 -->
+      <section data-background-color="#FDFBF7">
+        <div class="slide-badge">MODELING INTUITION</div>
+        <h2 style="font-size: 1.5em; text-align: left; margin-bottom: 10px;">
+          思考工具：<span class="highlight-pink">顧問問題</span> (Consultant Question)
+        </h2>
+        <p style="font-size: 0.7em; color: var(--text-sub); text-align: left; margin-bottom: 20px;">
+          如何拿捏狀態的多寡？一場優雅的思想實驗
+        </p>
+
+        <div class="note-card">
+          <div class="washi-tape"></div>
+          <p style="font-size: 0.82em; line-height: 1.8; margin-top: 5px; color: #3A3A3A;">
+            ☕ <strong>顧問問題場景</strong>：<br>
+            「客戶在某系統中已經執行了一連串決策，半路聘請你接手。<br>
+            為了從當前狀況開始做出最優決策，你<strong>最少</strong>需要向客戶詢問哪些資訊？」
+          </p>
+
+          <table class="cute-table">
+            <thead>
+              <tr>
+                <th>狀態設計維度</th>
+                <th>面臨後果</th>
+                <th>演算法表現</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>狀態變數太少</strong></td>
+                <td>遺漏關鍵約束與歷史</td>
+                <td>最佳化原理破功，給出錯誤解答 ❌</td>
+              </tr>
+              <tr>
+                <td><strong>狀態變數過多</strong></td>
+                <td>記錄無關細節（如整條歷史）</td>
+                <td>維度詛咒（Curse of Dim.），算力爆炸 💥</td>
+              </tr>
+              <tr>
+                <td><strong>精準充分狀態</strong></td>
+                <td>剛好滿足馬可夫無後效性</td>
+                <td>多項式時間精確求解，優雅高效 ✔</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <aside class="notes">
+          每次設計狀態時，不妨問自己這個顧問問題。客戶的歷史很長，但你真的需要知道他前面走過的所有路徑嗎？不需要，你只需要知道關鍵那一點。這就是建模的審美。
+        </aside>
+      </section>
+
+      <!-- Slide 7: 總結與未來展望 -->
+      <section data-background-color="#FDFBF7">
+        <div class="slide-badge">SUMMARY & ROADMAP</div>
+        <h2 style="font-size: 1.5em; text-align: left; margin-bottom: 10px;">
+          總結：狀態是 <span class="highlight-matcha">演算法的邊界</span> ✿
+        </h2>
+        <p style="font-size: 0.7em; color: var(--text-sub); text-align: left; margin-bottom: 20px;">
+          從經典運籌學到當代大語言模型與深度強化學習
+        </p>
+
+        <div class="note-card" style="margin-bottom: 15px;">
+          <div class="washi-tape washi-tape-matcha"></div>
+          <ul class="cute-list matcha-list" style="font-size: 0.75em;">
+            <li><strong>狀態定義了思考邊界</strong>：決定了動態規劃查找表（Look-up Table）的幾何架構與演算法正確性。</li>
+            <li><strong>約束即擴增</strong>：轉彎限制、跳躍次數（Jump coupons）、累積懲罰，本質上都是在為狀態增添離散維度。</li>
+            <li><strong>當維度無限大時</strong>：在現代深度學習與 RL 中，由神經網路（DQN/Policy Network）接棒完成狀態空間的函數近似（Function Approximation）。</li>
+          </ul>
+        </div>
+
+        <div class="note-card" style="background: #FFFDF9; border: 1px solid var(--caramel-warm); text-align: center; padding: 16px;">
+          <span style="font-size: 0.85em; font-weight: 700; color: #9A6A32;">
+            「優雅的狀態空間定義，是將紛繁複雜的現實轉化為簡潔遞迴的唯一橋樑。」
+          </span>
+        </div>
+
+        <aside class="notes">
+          總結今天所學，動態規劃不是死記公式，而是學習如何給世界一個合理的狀態切片。下一次，我們將探討當狀態空間擴大到無限大時，現代強化學習如何接棒處理！
+        </aside>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Reveal.js JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/notes/notes.min.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: 'c/t',
+      transition: 'fade',
+      transitionSpeed: 'fast',
+      backgroundTransition: 'fade',
+      plugins: [ RevealNotes ]
+    });
+  </script>
+</body>
+</html>
